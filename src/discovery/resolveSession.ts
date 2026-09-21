@@ -39,10 +39,15 @@ export async function findTranscripts(roots: readonly string[]): Promise<readonl
   return perRoot.flat();
 }
 
+/** Roots may be symlinks, junctions or Windows 8.3 short names; compare canonical forms on both sides. */
+async function canonicalRoots(roots: readonly string[]): Promise<readonly string[]> {
+  return Promise.all(roots.map((r) => realpath(r).catch(() => r)));
+}
+
 async function resolvePath(ref: string, roots: readonly string[]): Promise<string> {
   const real = await realpath(ref).catch(() => null);
   if (real === null) throw new Error(`Session not found: ${ref}`);
-  if (!isInsideRoots(real, roots)) throw new Error(`Path outside allowed roots: ${ref}`);
+  if (!isInsideRoots(real, await canonicalRoots(roots))) throw new Error(`Path outside allowed roots: ${ref}`);
   return real;
 }
 

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { join } from 'node:path';
-import { realpathSync } from 'node:fs';
+import { realpathSync, symlinkSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { resolveSession, findTranscripts } from '../../src/discovery/resolveSession.js';
 import { mkTmpRoot } from '../helpers/tmpRoot.js';
 import { assistantLine } from '../helpers/lines.js';
@@ -36,6 +37,14 @@ describe('resolveSession', () => {
     const p = join(r, 'p1', 'aaaa.jsonl');
     expect(await resolveSession(p, [r])).toBe(realpathSync(p));
   });
+  it('accepts a root given as a junction/symlink to the real directory', async () => {
+    const r = root();
+    const link = join(mkdtempSync(join(tmpdir(), 'cfm-link-')), 'root-link');
+    symlinkSync(r, link, 'junction');
+    expect(await resolveSession('latest', [link])).toBe(realpathSync(join(r, 'p2', 'bbbb.jsonl')));
+    expect(await resolveSession('aaaa', [link])).toBe(realpathSync(join(r, 'p1', 'aaaa.jsonl')));
+  });
+
   it('rejects a path outside roots', async () => {
     const r = root();
     const other = root();
