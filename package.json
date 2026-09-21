@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "context-forensics-mcp",
   "version": "0.1.0",
   "description": "Forensic analysis of Claude Code session transcripts: where your tokens went, what it cost, and where to compact.",
@@ -19,7 +19,7 @@
     "dev": "tsx src/index.ts",
     "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
-  "repository": { "type": "git", "url": "https://github.com/angelfmoncada/context-forensics-mcp" },
+  "repository": { "type": "git", "url": "https://github.com/Angelfmoncada/context-forensics-mcp" },
   "keywords": ["mcp", "model-context-protocol", "claude-code", "tokens", "cost", "context-window", "observability", "ai"],
   "dependencies": {
     "@modelcontextprotocol/server": "^2.0.0",
