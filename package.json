@@ -1,0 +1,36 @@
+{
+  "name": "context-forensics-mcp",
+  "version": "0.1.0",
+  "description": "Forensic analysis of Claude Code session transcripts: where your tokens went, what it cost, and where to compact.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "context-forensics-mcp": "./dist/index.js",
+    "context-forensics": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "files": ["dist", "README.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node -e \"require('fs').mkdirSync('dist/pricing',{recursive:true});require('fs').copyFileSync('src/pricing/models.json','dist/pricing/models.json')\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "repository": { "type": "git", "url": "https://github.com/angelfmoncada/context-forensics-mcp" },
+  "keywords": ["mcp", "model-context-protocol", "claude-code", "tokens", "cost", "context-window", "observability", "ai"],
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.0.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.0.0",
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^5.0.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^5.0.1"
+  }
+}
