@@ -134,7 +134,7 @@ with the SDK client and calls every tool.
 
 ## 8. Publishing
 
-- Repo: `C:\Users\angel\Downloads\context-forensics-mcp`, public on GitHub via `gh repo create`.
+- Repo: local checkout, public on GitHub via `gh repo create`.
 - README: one-line install (`npx -y context-forensics-mcp`), config snippets for Claude Code /
   Claude Desktop / Cursor, real example outputs, tool reference, pricing override, roots override.
 - `npm publish` prepared (`prepublishOnly: build + test`); requires user's `npm login`.

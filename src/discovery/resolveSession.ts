@@ -46,16 +46,19 @@ async function resolvePath(ref: string, roots: readonly string[]): Promise<strin
   return real;
 }
 
-/** Resolves "latest", a session id, or a .jsonl path to a real path inside the allowed roots. */
+/**
+ * Resolves "latest", a session id, or an absolute .jsonl path to a real path inside the allowed roots.
+ * Every branch ends in resolvePath, so a symlink planted under a root cannot point outside it.
+ */
 export async function resolveSession(ref: string, roots: readonly string[]): Promise<string> {
   if (ref === 'latest') {
     const newest = [...(await findTranscripts(roots))].sort((a, b) => b.mtimeMs - a.mtimeMs)[0];
     if (!newest) throw new Error('Session not found: no transcripts under allowed roots');
-    return realpath(newest.path);
+    return resolvePath(newest.path, roots);
   }
   if (isAbsolute(ref)) return resolvePath(ref, roots);
   const id = ref.endsWith(EXT) ? ref.slice(0, -EXT.length) : ref;
   const match = (await findTranscripts(roots)).find((t) => t.id === id);
   if (!match) throw new Error(`Session not found: ${ref}`);
-  return realpath(match.path);
+  return resolvePath(match.path, roots);
 }
