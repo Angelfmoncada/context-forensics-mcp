@@ -14,9 +14,9 @@ export interface SessionInfo {
 }
 
 export interface ListFilter {
-  readonly project?: string;
-  readonly since?: string;
-  readonly limit?: number;
+  readonly project?: string | undefined;
+  readonly since?: string | undefined;
+  readonly limit?: number | undefined;
 }
 
 const DEFAULT_LIMIT = 20;

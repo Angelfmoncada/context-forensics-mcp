@@ -19,6 +19,7 @@ const OverrideSchema = z.object({
 
 export type ModelPrice = z.infer<typeof ModelPriceSchema>;
 export type Pricing = z.infer<typeof PricingSchema>;
+type ModelPatches = NonNullable<z.infer<typeof OverrideSchema>['models']>;
 
 const BUNDLED_PATH = join(dirname(fileURLToPath(import.meta.url)), 'models.json');
 
@@ -30,7 +31,7 @@ async function readJson(path: string): Promise<unknown> {
   }
 }
 
-function mergeModels(base: Pricing['models'], patch: Record<string, Partial<ModelPrice>>): Pricing['models'] {
+function mergeModels(base: Pricing['models'], patch: ModelPatches): Pricing['models'] {
   const ids = new Set([...Object.keys(base), ...Object.keys(patch)]);
   return Object.fromEntries(
     [...ids].map((id) => {
