@@ -68,7 +68,7 @@ function binaries(results: readonly AttributedResult[]): readonly Finding[] {
     kind: 'binary_in_context',
     severity: 'medium',
     title: `${bin.length} binary/image result(s) in context`,
-    evidence: bin.map((r) => `${r.tool}@turn ${r.turnIndex}`).join(', '),
+    evidence: `${bin.map((r) => `${r.tool}@turn ${r.turnIndex}`).join(', ')}; base64 inflates the transcript, and bytes/4 overstates real image tokens`,
     estSavingsTokens: sumTokens(bin)
   }];
 }
