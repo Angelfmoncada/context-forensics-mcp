@@ -25,5 +25,6 @@ describe('listSessions', () => {
     expect((await listSessions([r], { project: 'ALP' })).map((s) => s.id)).toEqual(['s1']);
     expect((await listSessions([r], { since: '2026-06-01' })).map((s) => s.id)).toEqual(['s2']);
     expect((await listSessions([r], { limit: 1 })).map((s) => s.id)).toEqual(['s2']);
+    await expect(listSessions([r], { since: 'garbage' })).rejects.toThrow(/Invalid "since"/);
   });
 });

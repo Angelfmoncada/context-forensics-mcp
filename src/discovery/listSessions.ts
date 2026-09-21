@@ -41,6 +41,7 @@ async function describeFile(f: TranscriptFile): Promise<SessionInfo> {
 /** Filters and sorts by mtime first, then parses only the selected files. */
 export async function listSessions(roots: readonly string[], filter: ListFilter): Promise<readonly SessionInfo[]> {
   const sinceMs = filter.since ? Date.parse(filter.since) : Number.NEGATIVE_INFINITY;
+  if (Number.isNaN(sinceMs)) throw new Error(`Invalid "since" date: ${filter.since}`);
   const needle = filter.project?.toLowerCase();
   const selected = (await findTranscripts(roots))
     .filter((f) => f.mtimeMs >= sinceMs && (!needle || f.project.toLowerCase().includes(needle)))

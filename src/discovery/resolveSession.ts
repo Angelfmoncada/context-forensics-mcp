@@ -53,8 +53,9 @@ export async function resolveSession(ref: string, roots: readonly string[]): Pro
     if (!newest) throw new Error('Session not found: no transcripts under allowed roots');
     return realpath(newest.path);
   }
-  if (isAbsolute(ref) || ref.endsWith(EXT)) return resolvePath(ref, roots);
-  const match = (await findTranscripts(roots)).find((t) => t.id === ref);
+  if (isAbsolute(ref)) return resolvePath(ref, roots);
+  const id = ref.endsWith(EXT) ? ref.slice(0, -EXT.length) : ref;
+  const match = (await findTranscripts(roots)).find((t) => t.id === id);
   if (!match) throw new Error(`Session not found: ${ref}`);
   return realpath(match.path);
 }

@@ -27,7 +27,7 @@ async function readJson(path: string): Promise<unknown> {
   try {
     return JSON.parse(await readFile(path, 'utf8'));
   } catch (e) {
-    throw new Error(`Cannot read pricing file ${path}: ${(e as Error).message}`);
+    throw new Error(`Cannot read pricing file ${path}: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
 

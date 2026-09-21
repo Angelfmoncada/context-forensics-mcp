@@ -4,10 +4,10 @@ import { resolveSession } from '../../discovery/resolveSession.js';
 import { listSessions } from '../../discovery/listSessions.js';
 import { parseTranscript } from '../../parser/parseTranscript.js';
 import { computeCost, mergeCostReports } from '../../analysis/cost.js';
-import { SESSION_REF_DESC, type ServerContext } from '../context.js';
+import { SESSION_REF_DESC, isoDate, type ServerContext } from '../context.js';
 import { ok, fail, failFrom, type ToolReply } from '../respond.js';
 
-const PROJECT_LIMIT = 200;
+const PROJECT_LIMIT = 1000;
 
 async function costOfSession(session: string, ctx: ServerContext): Promise<ToolReply> {
   const c = computeCost(await parseTranscript(await resolveSession(session, ctx.roots)), ctx.pricing);
@@ -21,7 +21,9 @@ async function costOfProject(project: string, since: string | undefined, until: 
     .filter((r) => r.endedAt === null || Date.parse(r.endedAt) <= untilMs);
   const reports = await Promise.all(rows.map(async (r) => computeCost(await parseTranscript(r.path), ctx.pricing)));
   const merged = mergeCostReports(reports, ctx.pricing.asOf);
-  return ok({ sessions: rows.length, ...merged }, `${rows.length} session(s) in "${project}": $${merged.total.total.toFixed(2)}.`);
+  const truncated = rows.length >= PROJECT_LIMIT;
+  const note = truncated ? ` Only the ${PROJECT_LIMIT} most recent sessions were counted; narrow the date range for a complete total.` : '';
+  return ok({ sessions: rows.length, truncated, ...merged }, `${rows.length} session(s) in "${project}": $${merged.total.total.toFixed(2)}.${note}`);
 }
 
 export function registerEstimateCost(server: McpServer, ctx: ServerContext): void {
@@ -34,8 +36,8 @@ export function registerEstimateCost(server: McpServer, ctx: ServerContext): voi
       inputSchema: z.object({
         session: z.string().optional().describe(SESSION_REF_DESC),
         project: z.string().optional().describe('Project directory substring; aggregates all matching sessions'),
-        since: z.string().optional().describe('ISO date lower bound (project mode)'),
-        until: z.string().optional().describe('ISO date upper bound (project mode)')
+        since: isoDate.optional().describe('ISO date lower bound (project mode)'),
+        until: isoDate.optional().describe('ISO date upper bound (project mode)')
       })
     },
     async ({ session, project, since, until }) => {

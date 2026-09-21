@@ -25,9 +25,11 @@ describe('resolveSession', () => {
     const r = root();
     expect(await resolveSession('latest', [r])).toBe(realpathSync(join(r, 'p2', 'bbbb.jsonl')));
   });
-  it('resolves by id', async () => {
+  it('resolves by id, with or without the .jsonl suffix', async () => {
     const r = root();
     expect(await resolveSession('aaaa', [r])).toBe(realpathSync(join(r, 'p1', 'aaaa.jsonl')));
+    expect(await resolveSession('aaaa.jsonl', [r])).toBe(realpathSync(join(r, 'p1', 'aaaa.jsonl')));
+    await expect(resolveSession('p1/aaaa.jsonl', [r])).rejects.toThrow(/Session not found/);
   });
   it('resolves by absolute path inside roots', async () => {
     const r = root();

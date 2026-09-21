@@ -67,6 +67,22 @@ describe('MCP tools', () => {
     expect((await call('estimate_cost', { session: 'sess1', project: 'demo' })).ok).toBe(false);
   });
 
+  it('rejects malformed dates instead of silently matching nothing', async () => {
+    const bad = await client.callTool({ name: 'list_sessions', arguments: { since: 'not-a-date' } });
+    expect(bad.isError).toBe(true);
+    expect((bad.content as { text: string }[])[0]?.text).toMatch(/ISO date/);
+    const badCost = await client.callTool({ name: 'estimate_cost', arguments: { project: 'demo', until: '2026-13-01' } });
+    expect(badCost.isError).toBe(true);
+    const good = await call('list_sessions', { since: '2026-9-1' });
+    expect(good.ok).toBe(true);
+  });
+
+  it('project cost reports truncated=false when under the limit', async () => {
+    const p = await call('estimate_cost', { project: 'demo' });
+    expect((p.data as { truncated: boolean }).truncated).toBe(false);
+    expect(p.summary).not.toMatch(/most recent/);
+  });
+
   it('diff_context_growth', async () => {
     const r = await call('diff_context_growth', { session: 'sess1', minDelta: 0 });
     expect((r.data as { peak: { contextTokens: number } }).peak.contextTokens).toBe(1200);
