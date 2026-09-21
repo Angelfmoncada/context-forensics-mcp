@@ -24,25 +24,25 @@ describe('findTranscripts', () => {
 describe('resolveSession', () => {
   it('resolves "latest" to most recently modified', async () => {
     const r = root();
-    expect(await resolveSession('latest', [r])).toBe(realpathSync(join(r, 'p2', 'bbbb.jsonl')));
+    expect(await resolveSession('latest', [r])).toBe(realpathSync.native(join(r, 'p2', 'bbbb.jsonl')));
   });
   it('resolves by id, with or without the .jsonl suffix', async () => {
     const r = root();
-    expect(await resolveSession('aaaa', [r])).toBe(realpathSync(join(r, 'p1', 'aaaa.jsonl')));
-    expect(await resolveSession('aaaa.jsonl', [r])).toBe(realpathSync(join(r, 'p1', 'aaaa.jsonl')));
+    expect(await resolveSession('aaaa', [r])).toBe(realpathSync.native(join(r, 'p1', 'aaaa.jsonl')));
+    expect(await resolveSession('aaaa.jsonl', [r])).toBe(realpathSync.native(join(r, 'p1', 'aaaa.jsonl')));
     await expect(resolveSession('p1/aaaa.jsonl', [r])).rejects.toThrow(/Session not found/);
   });
   it('resolves by absolute path inside roots', async () => {
     const r = root();
     const p = join(r, 'p1', 'aaaa.jsonl');
-    expect(await resolveSession(p, [r])).toBe(realpathSync(p));
+    expect(await resolveSession(p, [r])).toBe(realpathSync.native(p));
   });
   it('accepts a root given as a junction/symlink to the real directory', async () => {
     const r = root();
     const link = join(mkdtempSync(join(tmpdir(), 'cfm-link-')), 'root-link');
     symlinkSync(r, link, 'junction');
-    expect(await resolveSession('latest', [link])).toBe(realpathSync(join(r, 'p2', 'bbbb.jsonl')));
-    expect(await resolveSession('aaaa', [link])).toBe(realpathSync(join(r, 'p1', 'aaaa.jsonl')));
+    expect(await resolveSession('latest', [link])).toBe(realpathSync.native(join(r, 'p2', 'bbbb.jsonl')));
+    expect(await resolveSession('aaaa', [link])).toBe(realpathSync.native(join(r, 'p1', 'aaaa.jsonl')));
   });
 
   it('rejects a path outside roots', async () => {
